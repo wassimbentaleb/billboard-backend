@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func PostsCreate(c *gin.Context) {
+func ClientCreate(c *gin.Context) {
 	// Get data off req body
 	var body struct {
 		Email     string
@@ -23,7 +23,7 @@ func PostsCreate(c *gin.Context) {
 		return
 	}
 	// Create a post
-	post := models.Post{Email: body.Email, FirstName: body.FirstName, LastName: body.LastName, State: body.State}
+	post := models.Client{Email: body.Email, FirstName: body.FirstName, LastName: body.LastName, State: body.State}
 
 	result := initializers.DB.Create(&post)
 
@@ -38,10 +38,10 @@ func PostsCreate(c *gin.Context) {
 	})
 }
 
-func PostsIndex(c *gin.Context) {
+func ClientIndex(c *gin.Context) {
 
 	//Get the posts
-	var posts []models.Post
+	var posts []models.Client
 	initializers.DB.Find(&posts)
 
 	// Response with them
@@ -50,12 +50,12 @@ func PostsIndex(c *gin.Context) {
 	})
 }
 
-func PostsShow(c *gin.Context) {
+func ClientShow(c *gin.Context) {
 	//Get id off url
 	id := c.Param("id")
 
 	//Get the posts
-	var post models.Post
+	var post models.Client
 	initializers.DB.First(&post, id)
 
 	// Response with them
@@ -64,7 +64,7 @@ func PostsShow(c *gin.Context) {
 	})
 }
 
-func PostsUpdate(c *gin.Context) {
+func ClientUpdate(c *gin.Context) {
 	//Get the id off the url
 	Id := c.Param("Id")
 
@@ -79,11 +79,11 @@ func PostsUpdate(c *gin.Context) {
 	c.Bind(&body)
 
 	//Find the post were upadating
-	var post models.Post
+	var post models.Client
 	initializers.DB.First(&post, Id)
 
 	//Updating it
-	initializers.DB.Model(&post).Updates(models.Post{
+	initializers.DB.Model(&post).Updates(models.Client{
 		Email:     body.Email,
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
@@ -96,12 +96,12 @@ func PostsUpdate(c *gin.Context) {
 	})
 }
 
-func PostsDelete(c *gin.Context) {
+func ClientDelete(c *gin.Context) {
 	//Get the id off the url
 	Id := c.Param("Id")
 
 	//Delete the posts
-	initializers.DB.Delete(&models.Post{}, Id)
+	initializers.DB.Delete(&models.Client{}, Id)
 
 	//Response
 	c.Status(200)

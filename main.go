@@ -33,11 +33,11 @@ func main() {
 	r.DELETE("/delete/:id", middleware.RequireAuth, controllers.UserDelete)
 
 	//CreateNewUser
-	r.POST("/newuser", controllers.PostsCreate)
-	r.PUT("/newuser/:Id", controllers.PostsUpdate)
-	r.GET("/newuser", controllers.PostsIndex)
-	r.GET("/newuser/:Id", controllers.PostsShow)
-	r.DELETE("/newuser/:Id", controllers.PostsDelete)
+	r.POST("/clientCreate", controllers.ClientCreate)
+	r.PUT("/clientUpdate/:Id", controllers.ClientUpdate)
+	r.GET("/clientsGet", controllers.ClientIndex)
+	r.GET("/clientGet/:Id", controllers.ClientShow)
+	r.DELETE("/clientDelete/:Id", controllers.ClientDelete)
 
 	// Lancement du serveur
 	r.Run() // écoute et sert sur 0.0.0.0:8080

@@ -8,7 +8,7 @@ type User struct {
 	Password  string
 }
 
-type Post struct {
+type Client struct {
 	ID        uint `gorm:"primarykey"`
 	Email     string
 	FirstName string
