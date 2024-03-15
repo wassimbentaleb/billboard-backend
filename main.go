@@ -12,17 +12,25 @@ func init() {
 	initializers.LoadEnvVariables()
 	initializers.ConnectToDB()
 	initializers.SyncDatabase()
-
 }
 
 func main() {
 	r := gin.Default()
+	r.Static("/media", "./static")
+	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	// Middleware CORS
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:3000"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders: []string{"X-Requested-With", "Content-Type", "Authorization", "ngrok-skip-browser-warning"},
+		AllowHeaders: []string{
+			"X-Requested-With",
+			"Content-Type",
+			"Authorization",
+			"ngrok-skip-browser-warning",
+			"Access-Control-Allow-Headers",
+			"Custom-Headers",
+		},
 	}))
 
 	// Définition des routes
@@ -38,6 +46,9 @@ func main() {
 	r.GET("/clientsGet", controllers.ClientIndex)
 	r.GET("/clientGet/:Id", controllers.ClientShow)
 	r.DELETE("/clientDelete/:Id", controllers.ClientDelete)
+
+	//UploadImage
+	r.POST("/handleFileUpload", controllers.HandleFileUpload)
 
 	// Lancement du serveur
 	r.Run() // écoute et sert sur 0.0.0.0:8080
