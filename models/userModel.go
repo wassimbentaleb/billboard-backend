@@ -1,5 +1,10 @@
 package models
 
+import (
+	"github.com/lib/pq"
+	"time"
+)
+
 type User struct {
 	ID        uint `gorm:"primarykey"`
 	FirstName string
@@ -14,4 +19,13 @@ type Client struct {
 	FirstName string
 	LastName  string
 	State     string
+}
+
+type Plans struct {
+	ID          uint `gorm:"primarykey"`
+	Title       string
+	StartDate   time.Time
+	EndDate     time.Time
+	Description string
+	ImageUrls   pq.StringArray `gorm:"type:text[]"`
 }

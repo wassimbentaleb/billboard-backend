@@ -49,6 +49,7 @@ func main() {
 
 	//UploadImage
 	r.POST("/handleFileUpload", controllers.HandleFileUpload)
+	r.POST("/HandleAddPlan", controllers.HandleAddPlan)
 
 	// Lancement du serveur
 	r.Run() // écoute et sert sur 0.0.0.0:8080

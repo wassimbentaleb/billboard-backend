@@ -22,7 +22,7 @@ func ClientCreate(c *gin.Context) {
 		})
 		return
 	}
-	// Create a post
+	// Create a Client
 	post := models.Client{Email: body.Email, FirstName: body.FirstName, LastName: body.LastName, State: body.State}
 
 	result := initializers.DB.Create(&post)
