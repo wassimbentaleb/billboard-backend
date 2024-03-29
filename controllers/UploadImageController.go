@@ -73,3 +73,13 @@ func HandleAddPlan(c *gin.Context) {
 		"plans": plans,
 	})
 }
+
+// fuction gets all plans
+func GetAllPlans(c *gin.Context) {
+	var plans []models.Plans
+	initializers.DB.Find(&plans)
+
+	c.JSON(200, gin.H{
+		"plans": plans,
+	})
+}
