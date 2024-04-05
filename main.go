@@ -47,6 +47,13 @@ func main() {
 	r.GET("/clientGet/:Id", controllers.ClientShow)
 	r.DELETE("/clientDelete/:Id", controllers.ClientDelete)
 
+	//CreateNewBillboard
+	r.POST("/billboardCreate", controllers.BillboardCreate)
+	r.PUT("/billboardUpdate/:Id", controllers.BillboardUpdate)
+	r.GET("/billboardsGet", controllers.BillboardIndex)
+	r.GET("/billboardGet/:Id", controllers.BillboardShow)
+	r.DELETE("/billboardDelete/:Id", controllers.BillboardDelete)
+
 	//UploadImage
 	r.POST("/handleFileUpload", controllers.HandleFileUpload)
 	r.POST("/HandleAddPlan", controllers.HandleAddPlan)

@@ -21,6 +21,14 @@ type Client struct {
 	State     string
 }
 
+type Billboard struct {
+	ID          uint `gorm:"primarykey"`
+	Name        string
+	Description string
+	State       string
+	Status      string
+}
+
 type Plans struct {
 	ID          uint `gorm:"primarykey"`
 	Title       string
