@@ -30,6 +30,7 @@ type Billboard struct {
 }
 
 type Plans struct {
+	BoardId     string
 	ID          uint `gorm:"primarykey"`
 	Title       string
 	StartDate   time.Time

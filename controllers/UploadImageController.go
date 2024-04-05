@@ -41,6 +41,7 @@ func HandleAddPlan(c *gin.Context) {
 	}
 
 	var body struct {
+		BoardId     string
 		Title       string
 		StartDate   time.Time
 		EndDate     time.Time
@@ -56,7 +57,7 @@ func HandleAddPlan(c *gin.Context) {
 	}
 	// Create a Plan
 
-	plans := models.Plans{Title: body.Title, StartDate: body.StartDate, EndDate: body.EndDate, Description: body.Description}
+	plans := models.Plans{BoardId: body.BoardId, Title: body.Title, StartDate: body.StartDate, EndDate: body.EndDate, Description: body.Description}
 
 	for _, image := range body.ImageUrls {
 		plans.ImageUrls = append(plans.ImageUrls, image)
@@ -78,6 +79,17 @@ func HandleAddPlan(c *gin.Context) {
 func GetAllPlans(c *gin.Context) {
 	var plans []models.Plans
 	initializers.DB.Find(&plans)
+
+	c.JSON(200, gin.H{
+		"plans": plans,
+	})
+}
+
+// fuction get plans for a specific BoardId
+func GetPlansByBoardId(c *gin.Context) {
+	boardId := c.Param("boardId")
+	var plans []models.Plans
+	initializers.DB.Where("board_id =?", boardId).Find(&plans)
 
 	c.JSON(200, gin.H{
 		"plans": plans,

@@ -58,6 +58,7 @@ func main() {
 	r.POST("/handleFileUpload", controllers.HandleFileUpload)
 	r.POST("/HandleAddPlan", controllers.HandleAddPlan)
 	r.GET("/GetAllPlans", controllers.GetAllPlans)
+	r.GET("/GetPlansByBoardId/:boardId", controllers.GetPlansByBoardId)
 
 	// Lancement du serveur
 	r.Run() // écoute et sert sur 0.0.0.0:8080
