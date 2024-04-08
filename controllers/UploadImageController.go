@@ -139,3 +139,23 @@ func GetPlansByBoardId(c *gin.Context) {
 		"plans": plans,
 	})
 }
+
+// fuction delete plans for a specific BoardId
+func DeletePlansByBoardId(c *gin.Context) {
+	boardId := c.Param("boardId")
+	var plans []models.Plans
+	initializers.DB.Where("board_id =?", boardId).Delete(&plans)
+
+	c.JSON(200, gin.H{
+		"plans": plans,
+	})
+}
+func DeletePlan(c *gin.Context) {
+	//Get the id off the url
+	id := c.Param("id")
+
+	//Delete the plans
+	initializers.DB.Delete(&models.Plans{}, id)
+
+	c.Status(200)
+}
