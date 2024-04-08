@@ -43,8 +43,8 @@ func HandleAddPlan(c *gin.Context) {
 	var body struct {
 		BoardId     string
 		Title       string
-		StartDate   time.Time
-		EndDate     time.Time
+		StartTime   time.Time
+		EndTime     time.Time
 		Description string
 		ImageUrls   []string
 	}
@@ -57,7 +57,7 @@ func HandleAddPlan(c *gin.Context) {
 	}
 	// Create a Plan
 
-	plans := models.Plans{BoardId: body.BoardId, Title: body.Title, StartDate: body.StartDate, EndDate: body.EndDate, Description: body.Description}
+	plans := models.Plans{BoardId: body.BoardId, Title: body.Title, StartDate: body.StartTime, EndDate: body.EndTime, Description: body.Description}
 
 	for _, image := range body.ImageUrls {
 		plans.ImageUrls = append(plans.ImageUrls, image)
@@ -69,6 +69,50 @@ func HandleAddPlan(c *gin.Context) {
 		c.JSON(400, gin.H{"err": result.Error})
 		return
 	}
+
+	c.JSON(200, gin.H{
+		"plans": plans,
+	})
+}
+
+// edit plan
+func HandleEditPlan(c *gin.Context) {
+	//Get the id of plan
+	id := c.Param("id")
+
+	// Get data off req body
+	type ImageTab struct {
+		Url string `json:"url"`
+	}
+
+	var body struct {
+		Title       string
+		StartTime   time.Time
+		EndTime     time.Time
+		Description string
+		ImageUrls   []string
+	}
+
+	if c.BindJSON(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to read body",
+		})
+		return
+	}
+
+	// find the post were updating
+	var plans models.Plans
+	initializers.DB.Where("id =?", id).First(&plans)
+
+	// updating it
+	initializers.DB.Model(&plans).Updates(models.Plans{
+
+		Title:       body.Title,
+		StartDate:   body.StartTime,
+		EndDate:     body.EndTime,
+		Description: body.Description,
+		ImageUrls:   body.ImageUrls,
+	})
 
 	c.JSON(200, gin.H{
 		"plans": plans,

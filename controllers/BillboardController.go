@@ -78,7 +78,7 @@ func BillboardUpdate(c *gin.Context) {
 
 	c.Bind(&body)
 
-	//Find the post were upadating
+	//Find the post were updating
 	var billboard models.Billboard
 	initializers.DB.First(&billboard, Id)
 
