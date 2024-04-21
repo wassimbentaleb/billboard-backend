@@ -1,4 +1,4 @@
-module awesomeProject1
+module billboard
 
 go 1.21
 
