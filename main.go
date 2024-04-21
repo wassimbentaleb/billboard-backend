@@ -1,17 +1,17 @@
 package main
 
 import (
-	"billboard/database"
-	"billboard/middleware"
-	"billboard/routes"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"billboard/controllers"
-
 	"github.com/joho/godotenv"
+
+	"billboard/controllers"
+	"billboard/database"
+	"billboard/middleware"
+	"billboard/routes"
 )
 
 func init() {
@@ -46,28 +46,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	// Définition des routes
-	//Auth
-	//r.POST("/signup", controllers.Signup)
-	//r.POST("/login", controllers.Login)
-	//r.GET("/validate/:id", middleware.RequireAuth, controllers.Validate)
-	//r.DELETE("/delete/:id", middleware.RequireAuth, controllers.UserDelete)
-	//
-	////CreateNewUser
-	//r.POST("/clientCreate", controllers.ClientCreate)
-	//r.PUT("/clientUpdate/:Id", controllers.ClientUpdate)
-	//r.GET("/clientsGet", controllers.ClientIndex)
-	//r.GET("/clientGet/:Id", controllers.ClientShow)
-	//r.DELETE("/clientDelete/:Id", controllers.ClientDelete)
-	//
-	////CreateNewBillboard
-
-	//
-	////UploadImage
-	//r.POST("/handleFileUpload", controllers.HandleFileUpload)
-	//r.POST("/HandleAddPlan", controllers.HandleAddPlan)
-	//r.GET("/GetAllPlans", controllers.GetAllPlans)
-	//r.GET("/GetPlansByBoardId/:boardId", controllers.GetPlansByBoardId)
-
 }
