@@ -6,4 +6,5 @@ type Board struct {
 	Description string `json:"description"`
 	State       string `json:"state"`
 	Status      string `json:"status"`
+	Plans       []Plan `gorm:"foreignKey:BoardID"`
 }

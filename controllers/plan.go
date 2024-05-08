@@ -81,6 +81,18 @@ func (plan *Plan) FindAll(c *gin.Context) {
 	c.JSON(200, gin.H{"plans": plans})
 }
 
+func (plan *Plan) FindByBoardID(c *gin.Context) {
+	// get board id from the url
+	boardId := c.Param("boardId")
+	var plans []entities.Plan
+
+	// get all the plans
+	plan.pg.DB.Find(&plans).Where("board_id = ?", boardId)
+
+	// return all the plans
+	c.JSON(200, gin.H{"plans": plans})
+}
+
 func (plan *Plan) FindByID(c *gin.Context) {
 	// get the id from the url
 	id := c.Param("id")

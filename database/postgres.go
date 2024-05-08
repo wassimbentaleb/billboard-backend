@@ -33,8 +33,8 @@ func NewPostgres() (*Postgres, error) {
 func (pg *Postgres) autoMigrate() error {
 	err := pg.DB.AutoMigrate(
 		&entities.User{},
-		&entities.Plan{},
 		&entities.Board{},
+		&entities.Plan{},
 	)
 
 	if err != nil {

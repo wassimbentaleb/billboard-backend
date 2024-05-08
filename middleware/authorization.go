@@ -24,7 +24,8 @@ func NewAuthMiddleware(pg *database.Postgres) *AuthMiddleware {
 
 func (middleware *AuthMiddleware) RequireAuth(c *gin.Context) {
 	// skip auth for login and signup
-	if strings.HasPrefix(c.Request.URL.Path, "/auth") {
+	if strings.HasPrefix(c.Request.URL.Path, "/auth") ||
+		strings.HasPrefix(c.Request.URL.Path, "/media") {
 		c.Next()
 		return
 	}
