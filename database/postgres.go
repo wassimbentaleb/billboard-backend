@@ -35,6 +35,7 @@ func (pg *Postgres) autoMigrate() error {
 		&entities.User{},
 		&entities.Board{},
 		&entities.Plan{},
+		&entities.Subscription{},
 	)
 
 	if err != nil {
