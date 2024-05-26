@@ -115,3 +115,69 @@ func (user *User) Login(c *gin.Context) {
 	// send it back
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
+
+// get all Signup
+func (user *User) FindAll(c *gin.Context) {
+	var users []entities.User
+
+	// get all the users
+	user.pg.DB.Find(&users)
+
+	c.JSON(http.StatusOK, gin.H{"users": users})
+}
+
+// delete Signup by id
+func (user *User) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	// check if the user exists
+	var dbUser entities.User
+	user.pg.DB.First(&dbUser, id)
+	if dbUser.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	// delete user
+	result := user.pg.DB.Delete(&entities.User{}, id)
+	if result.Error != nil {
+		log.Print(result.Error.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+// update user by id
+func (user *User) Update(c *gin.Context) {
+	//get the id from the url
+	id := c.Param("id")
+
+	// check if the user exists
+	var dbUser entities.User
+	user.pg.DB.First(&dbUser, id)
+	if dbUser.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	// retrieve data from req body and validate it
+	updatedUser := entities.User{}
+	err := c.BindJSON(&updatedUser)
+	if err != nil {
+		log.Print(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// update user
+	result := user.pg.DB.Model(&dbUser).Updates(updatedUser)
+	if result.Error != nil {
+		log.Print(result.Error.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
