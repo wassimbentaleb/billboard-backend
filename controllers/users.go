@@ -22,7 +22,7 @@ func NewUser(pg *database.Postgres) *User {
 	return &User{pg: pg}
 }
 
-func (user *User) Signup(c *gin.Context) {
+func (user *User) Create(c *gin.Context) {
 	newUser := entities.User{}
 	err := c.BindJSON(&newUser)
 	if err != nil {
@@ -40,7 +40,8 @@ func (user *User) Signup(c *gin.Context) {
 	}
 
 	// hash the password
-	hash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), 10)
+	const DefaultPassword = "12345678"
+	hash, err := bcrypt.GenerateFromPassword([]byte(DefaultPassword), 10)
 	if err != nil {
 		log.Print(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -56,22 +57,8 @@ func (user *User) Signup(c *gin.Context) {
 		return
 	}
 
-	// generate a jwt token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": newUser.ID,
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	})
-
-	// sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	if err != nil {
-		log.Print(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// send it back
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	// return status created
+	c.Status(http.StatusCreated)
 }
 
 func (user *User) Login(c *gin.Context) {
@@ -116,17 +103,29 @@ func (user *User) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
 
-// get all Signup
 func (user *User) FindAll(c *gin.Context) {
 	var users []entities.User
 
 	// get all the users
-	user.pg.DB.Find(&users)
-
+	user.pg.DB.Where("is_admin = ?", false).Find(&users)
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
-// delete Signup by id
+func (user *User) FindCurrent(c *gin.Context) {
+	currentUser, _ := c.Get("user")
+	id := currentUser.(entities.User).ID
+
+	// get the user from the database by id
+	var dbUser entities.User
+	user.pg.DB.First(&dbUser, id)
+	if dbUser.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"user": dbUser})
+}
+
 func (user *User) Delete(c *gin.Context) {
 	id := c.Param("id")
 
@@ -149,7 +148,6 @@ func (user *User) Delete(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// update user by id
 func (user *User) Update(c *gin.Context) {
 	//get the id from the url
 	id := c.Param("id")
@@ -163,12 +161,46 @@ func (user *User) Update(c *gin.Context) {
 	}
 
 	// retrieve data from req body and validate it
-	updatedUser := entities.User{}
+	updatedUser := entities.UpdateUserRequest{}
 	err := c.BindJSON(&updatedUser)
 	if err != nil {
 		log.Print(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	// update password if provided
+	if updatedUser.Password != "" {
+		// compare request password with real user password using hashs
+		err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(updatedUser.Password))
+		if err != nil {
+			log.Print("invalid password")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid password"})
+			return
+		}
+
+		// test if new password is provided
+		if updatedUser.NewPassword == "" {
+			log.Print("new password is required")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "new password is required"})
+			return
+		}
+
+		// check the minimum new password length
+		if len(updatedUser.NewPassword) < 8 {
+			log.Print("new password must be at least 8 characters long")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "new password must be at least 8 characters long"})
+			return
+		}
+
+		// hash the new password
+		hash, err := bcrypt.GenerateFromPassword([]byte(updatedUser.NewPassword), 10)
+		if err != nil {
+			log.Print(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		updatedUser.Password = string(hash)
 	}
 
 	// update user
