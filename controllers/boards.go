@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
@@ -28,6 +32,34 @@ func (board *Board) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// generate ref string on six hex characters
+	// Create a byte slice to hold the random bytes
+	bytes := make([]byte, 3) // 3 bytes = 6 hex characters
+
+	// Read random bytes
+	_, err = rand.Read(bytes)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// Encode the bytes to a hexadecimal string
+	hexString := strings.ToUpper(hex.EncodeToString(bytes))
+
+	// Print the result
+	fmt.Println("Random Hex String:", hexString)
+
+	// Check if the hex string already exists in the database
+	var dbBoard entities.Board
+	board.pg.DB.First(&dbBoard, "ref =?", hexString)
+	if dbBoard.ID != 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ref string already exists"})
+		return
+	}
+
+	// set the ref string
+	newBoard.Ref = hexString
 
 	// create a new board
 	result := board.pg.DB.Create(&newBoard)
