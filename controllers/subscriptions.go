@@ -56,3 +56,54 @@ func (subscription *Subscription) Delete(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+// get all subscription
+func (subscription *Subscription) FindAll(c *gin.Context) {
+	var subscriptions []entities.Subscription
+	subscription.pg.DB.Find(&subscriptions)
+
+	c.JSON(http.StatusOK, gin.H{"subscriptions": subscriptions})
+}
+
+// get subscription by id
+func (subscription *Subscription) FindByID(c *gin.Context) {
+	id := c.Param("id")
+
+	// check if the subscription exists
+	var dbSubscription entities.Subscription
+	subscription.pg.DB.First(&dbSubscription, id)
+	if dbSubscription.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "subscription not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"subscription": dbSubscription})
+}
+
+// update subscription
+func (subscription *Subscription) Update(c *gin.Context) {
+	id := c.Param("id")
+
+	// check if the subscription exists
+	var dbSubscription entities.Subscription
+	subscription.pg.DB.First(&dbSubscription, id)
+	if dbSubscription.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "subscription not found"})
+		return
+	}
+
+	updatedSubscription := entities.Subscription{}
+	err := c.BindJSON(&updatedSubscription)
+	if err != nil {
+		log.Print(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result := subscription.pg.DB.Save(&updatedSubscription)
+	if result.Error != nil {
+		log.Print(result.Error.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+}

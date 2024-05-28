@@ -1,9 +1,9 @@
 package entities
 
-import "time"
-
 type Subscription struct {
-	ID          uint      `json:"id" gorm:"primaryKey"`
-	EndDate     time.Time `json:"endDate" binding:"required"`
-	CreatedDate time.Time `json:"createdDate" binding:"required"`
+	ID          uint   `json:"id" gorm:"primaryKey"`
+	CompanyName string `json:"company_name" binding:"required"`
+	EndDate     string `json:"endDate" binding:"required"`
+	CreatedDate string `json:"createdDate" binding:"required"`
+	Paid        string `json:"paid" binding:"required"`
 }

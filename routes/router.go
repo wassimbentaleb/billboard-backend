@@ -13,6 +13,7 @@ func NewRouter(
 	boardController *controllers.Board,
 	planController *controllers.Plan,
 	uploadController *controllers.Upload,
+	subscriptionController *controllers.Subscription,
 	middleware *middleware.AuthMiddleware,
 ) *gin.Engine {
 	// create a new gin router
@@ -36,6 +37,7 @@ func NewRouter(
 	boardHandler(router, boardController)
 	planHandler(router, planController)
 	uploadHandler(router, uploadController)
+	subscriptionHandler(router, subscriptionController)
 
 	return router
 }

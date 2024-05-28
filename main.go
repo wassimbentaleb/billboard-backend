@@ -30,6 +30,7 @@ func main() {
 	userController := controllers.NewUser(pg)
 	boardController := controllers.NewBoard(pg)
 	planController := controllers.NewPlan(pg)
+	subscriptionController := controllers.NewSubscription(pg)
 	uploadController := controllers.NewUpload()
 	authMiddleware := middleware.NewAuthMiddleware(pg)
 
@@ -38,6 +39,7 @@ func main() {
 		boardController,
 		planController,
 		uploadController,
+		subscriptionController,
 		authMiddleware,
 	)
 
