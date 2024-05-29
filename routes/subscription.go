@@ -11,4 +11,5 @@ func subscriptionHandler(router *gin.Engine, subscriptionController *controllers
 	router.GET("/subscription/:id", subscriptionController.FindByID)
 	router.PUT("/subscription/:id", subscriptionController.Update)
 	router.DELETE("/subscription/:id", subscriptionController.Delete)
+	router.GET("/subscriptions/companyName", subscriptionController.FindByCompanyName)
 }

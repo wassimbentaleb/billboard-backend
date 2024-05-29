@@ -24,6 +24,13 @@ func (subscription *Subscription) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// Check if CompanyName exists in users table
+	var existingUser entities.User
+	subscription.pg.DB.First(&existingUser, "company_name = ?", newSubscription.CompanyName)
+	if existingUser.ID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "company name does not exist"})
+		return
+	}
 
 	result := subscription.pg.DB.Create(&newSubscription)
 	if result.Error != nil {
@@ -106,4 +113,19 @@ func (subscription *Subscription) Update(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
+}
+
+// get subscription by company_name
+func (subscription *Subscription) FindByCompanyName(c *gin.Context) {
+	companyName := c.Param("company_name")
+
+	// check if the subscription exists
+	var dbSubscription entities.Subscription
+	subscription.pg.DB.First(&dbSubscription, "company_name =?", companyName)
+	if dbSubscription.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "subscription not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"subscription": dbSubscription})
 }
