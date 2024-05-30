@@ -1,14 +1,15 @@
 package entities
 
 type User struct {
-	ID                 uint   `json:"id" gorm:"primaryKey"`
-	CompanyName        string `json:"company_name" binding:"required"`
-	Email              string `json:"email" binding:"required,email" gorm:"unique"`
-	Password           string `json:"-"`
-	PhoneNumber        string `json:"phone_number" binding:"required"`
-	Address            string `json:"address" binding:"required"`
-	ActiveSubscription string `json:"-"`
-	IsAdmin            bool   `json:"-" gorm:"default:false"`
+	ID                 uint           `json:"id" gorm:"primaryKey"`
+	CompanyName        string         `json:"company_name" binding:"required"`
+	Email              string         `json:"email" binding:"required,email" gorm:"unique"`
+	Password           string         `json:"-"`
+	PhoneNumber        string         `json:"phone_number" binding:"required"`
+	Address            string         `json:"address" binding:"required"`
+	ActiveSubscription string         `json:"-"`
+	IsAdmin            bool           `json:"-" gorm:"default:false"`
+	Subscriptions      []Subscription `json:"subscriptions" gorm:"foreignKey:UserID"`
 }
 
 type LoginRequest struct {
