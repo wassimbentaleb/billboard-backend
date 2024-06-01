@@ -25,13 +25,9 @@ func (subscription *Subscription) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	//// Check if CompanyName exists in users table
-	//var existingUser entities.User
-	//subscription.pg.DB.First(&existingUser, "company_name = ?", newSubscription.CompanyName)
-	//if existingUser.ID == 0 {
-	//	c.JSON(http.StatusBadRequest, gin.H{"error": "company name does not exist"})
-	//	return
-	//}
+
+	// prevent user creation
+	newSubscription.User = nil
 
 	result := subscription.pg.DB.Create(&newSubscription)
 	if result.Error != nil {
@@ -40,7 +36,22 @@ func (subscription *Subscription) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"subscription": newSubscription})
+	var client entities.User
+	subscription.pg.DB.First(&client, newSubscription.UserID).Select("company_name")
+	if client.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "client not found"})
+		return
+	}
+
+	response := entities.SubscriptionResponse{
+		ID:          newSubscription.ID,
+		EndDate:     newSubscription.EndDate,
+		CreatedDate: newSubscription.CreatedDate,
+		Paid:        newSubscription.Paid,
+		CompanyName: client.CompanyName,
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"subscription": response})
 }
 
 func (subscription *Subscription) Delete(c *gin.Context) {
@@ -65,15 +76,24 @@ func (subscription *Subscription) Delete(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// get all subscription
 func (subscription *Subscription) FindAll(c *gin.Context) {
 	var subscriptions []entities.Subscription
-	subscription.pg.DB.Find(&subscriptions)
+	subscription.pg.DB.Preload("User").Find(&subscriptions)
 
-	c.JSON(http.StatusOK, gin.H{"subscriptions": subscriptions})
+	var response []entities.SubscriptionResponse
+	for _, item := range subscriptions {
+		response = append(response, entities.SubscriptionResponse{
+			ID:          item.ID,
+			EndDate:     item.EndDate,
+			CreatedDate: item.CreatedDate,
+			Paid:        item.Paid,
+			CompanyName: item.User.CompanyName,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"subscriptions": response})
 }
 
-// get subscription by id
 func (subscription *Subscription) FindByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -88,7 +108,6 @@ func (subscription *Subscription) FindByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"subscription": dbSubscription})
 }
 
-// update subscription
 func (subscription *Subscription) Update(c *gin.Context) {
 	id := c.Param("id")
 
@@ -116,7 +135,6 @@ func (subscription *Subscription) Update(c *gin.Context) {
 	}
 }
 
-// get subscription by company_name
 func (subscription *Subscription) FindByCompanyName(c *gin.Context) {
 	value := c.Param("companyName")
 
