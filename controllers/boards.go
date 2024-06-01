@@ -144,7 +144,7 @@ func (board *Board) Delete(c *gin.Context) {
 	}
 
 	// delete board
-	result := board.pg.DB.Delete(&entities.Board{}, id)
+	result := board.pg.DB.Select("Plans").Delete(&entities.Board{ID: dbBoard.ID})
 	if result.Error != nil {
 		log.Print(result.Error.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
