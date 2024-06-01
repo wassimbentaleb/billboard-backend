@@ -26,9 +26,6 @@ func (subscription *Subscription) Create(c *gin.Context) {
 		return
 	}
 
-	// prevent user creation
-	newSubscription.User = nil
-
 	result := subscription.pg.DB.Create(&newSubscription)
 	if result.Error != nil {
 		log.Print(result.Error.Error())
@@ -80,7 +77,7 @@ func (subscription *Subscription) FindAll(c *gin.Context) {
 	var subscriptions []entities.Subscription
 	subscription.pg.DB.Preload("User").Find(&subscriptions)
 
-	var response []entities.SubscriptionResponse
+	response := make([]entities.SubscriptionResponse, 0)
 	for _, item := range subscriptions {
 		response = append(response, entities.SubscriptionResponse{
 			ID:          item.ID,

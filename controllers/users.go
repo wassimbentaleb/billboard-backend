@@ -6,12 +6,12 @@ import (
 	"os"
 	"time"
 
+	"billboard/database"
+	"billboard/entities"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
-
-	"billboard/database"
-	"billboard/entities"
 )
 
 type User struct {
@@ -138,7 +138,7 @@ func (user *User) Delete(c *gin.Context) {
 	}
 
 	// delete user
-	result := user.pg.DB.Delete(&entities.User{}, id)
+	result := user.pg.DB.Select("Subscriptions").Delete(&entities.User{ID: dbUser.ID})
 	if result.Error != nil {
 		log.Print(result.Error.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
