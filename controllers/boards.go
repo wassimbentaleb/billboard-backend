@@ -153,3 +153,39 @@ func (board *Board) Delete(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+func (board *Board) linkBoardUpdate(c *gin.Context) {
+
+	//check if the ref exists dans la board table
+	var dbBoard entities.Board
+	board.pg.DB.First(&dbBoard, "ref =?", c.Param("ref"))
+	if dbBoard.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "board not found"})
+		return
+	}
+
+	// retrieve data from req body and validate it
+	updatedBoard := entities.Board{
+		Name:        dbBoard.Name,
+		Description: dbBoard.Description,
+		Address:     dbBoard.Address,
+	}
+	err := c.BindJSON(&updatedBoard)
+	if err != nil {
+		log.Print(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// update the board in the database
+	result := board.pg.DB.Model(&updatedBoard).Clauses(clause.Returning{}).Where("id =?", dbBoard.ID).Updates(&updatedBoard)
+	if result.Error != nil {
+		log.Print(result.Error.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	// return updated board
+	c.JSON(http.StatusOK, gin.H{"board": updatedBoard})
+
+}
