@@ -13,5 +13,5 @@ func boardHandler(router *gin.Engine, boardController *controllers.Board) {
 	router.PUT("/board/:id", boardController.Update)
 	router.DELETE("/board/:id", boardController.Delete)
 
-	router.PUT("/board/:id", boardController.Update)
+	router.PUT("/board", boardController.LinkBoardUpdate)
 }
