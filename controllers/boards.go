@@ -68,7 +68,6 @@ func (board *Board) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
-
 	// return it
 	c.JSON(http.StatusCreated, gin.H{"board": newBoard})
 }
@@ -111,6 +110,17 @@ func (board *Board) FindAll(c *gin.Context) {
 
 	// get all the boards
 	board.pg.DB.Find(&boards)
+
+	// return all the boards
+	c.JSON(200, gin.H{"boards": boards})
+}
+
+func (board *Board) FindAllByUser(c *gin.Context) {
+	currentUser, _ := c.Get("user")
+	userId := currentUser.(entities.User).ID
+
+	var boards []entities.Board
+	board.pg.DB.Where("user_id = ?", userId).Find(&boards)
 
 	// return all the boards
 	c.JSON(200, gin.H{"boards": boards})
@@ -176,8 +186,17 @@ func (board *Board) LinkBoardUpdate(c *gin.Context) {
 		return
 	}
 
-	// update the board in the database
+	if dbBoard.UserID != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "board already affected"})
+		return
+	}
+
+	currentUser, _ := c.Get("user")
+	userId := currentUser.(entities.User).ID
+	requestBody.UserID = &userId
 	requestBody.Status = "active"
+
+	// update the board in the database
 	result := board.pg.DB.Model(&requestBody).Clauses(clause.Returning{}).Where("ref = ?", ref).Updates(&requestBody)
 	if result.Error != nil {
 		log.Print(result.Error.Error())

@@ -87,7 +87,11 @@ func (plan *Plan) FindByBoardID(c *gin.Context) {
 	var plans []entities.Plan
 
 	// get all the plans
-	plan.pg.DB.Find(&plans).Where("board_id = ?", boardId)
+	plan.pg.DB.Where("board_id = ?", boardId).Find(&plans)
+	if len(plans) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "plans not found"})
+		return
+	}
 
 	// return all the plans
 	c.JSON(200, gin.H{"plans": plans})

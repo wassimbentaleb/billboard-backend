@@ -10,6 +10,7 @@ type User struct {
 	ActiveSubscription string         `json:"-"`
 	IsAdmin            bool           `json:"-" gorm:"default:false"`
 	Subscriptions      []Subscription `json:"subscriptions" gorm:"foreignKey:UserID"`
+	Boards             *[]Board       `json:"boards" gorm:"foreignKey:UserID"`
 }
 
 type LoginRequest struct {

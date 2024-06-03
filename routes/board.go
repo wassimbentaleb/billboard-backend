@@ -9,6 +9,7 @@ import (
 func boardHandler(router *gin.Engine, boardController *controllers.Board) {
 	router.POST("/board", boardController.Create)
 	router.GET("/boards", boardController.FindAll)
+	router.GET("/board", boardController.FindAllByUser)
 	router.GET("/board/:id", boardController.FindByID)
 	router.PUT("/board/:id", boardController.Update)
 	router.DELETE("/board/:id", boardController.Delete)

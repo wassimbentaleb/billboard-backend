@@ -8,4 +8,5 @@ type Board struct {
 	Address     string `json:"address"`
 	Status      string `json:"status" gorm:"default:not active"`
 	Plans       []Plan `gorm:"foreignKey:BoardID"`
+	UserID      *uint  `json:"-"`
 }
